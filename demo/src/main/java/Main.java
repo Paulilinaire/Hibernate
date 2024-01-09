@@ -1,3 +1,5 @@
+import heritage.table_per_class.CreditCardPayment3;
+import heritage.table_per_class.PaypalPayment3;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -11,7 +13,7 @@ import heritage.single_table.PaypalPayment2;
 import java.util.Date;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main() {
 
         StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
         SessionFactory sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
@@ -45,22 +47,42 @@ public class Main {
 
 
             // Exemple single table :
-            CreditCardPayment2 creditCardPayment2 = new CreditCardPayment2();
-            creditCardPayment2.setCardNumber("17121992");
-            creditCardPayment2.setAmount(10000);
-            creditCardPayment2.setPaymentDate(new Date());
-            creditCardPayment2.setExpirationDate("06/2027");
+//            CreditCardPayment2 creditCardPayment2 = new CreditCardPayment2();
+//            creditCardPayment2.setCardNumber("17121992");
+//            creditCardPayment2.setAmount(10000);
+//            creditCardPayment2.setPaymentDate(new Date());
+//            creditCardPayment2.setExpirationDate("06/2027");
+//
+//            PaypalPayment2 paypalPayment2 = new PaypalPayment2();
+//            paypalPayment2.setAccountNumber("147852");
+//            paypalPayment2.setPaymentDate(new Date());
+//            paypalPayment2.setAmount(142058.254);
+//
+//            session.save(creditCardPayment2);
+//            session.save(paypalPayment2);
+//
+//            System.out.println("creditCardPayment " + creditCardPayment2);
+//            System.out.println("paypalPayment " + paypalPayment2);
+//
+//            tx.commit();
 
-            PaypalPayment2 paypalPayment2 = new PaypalPayment2();
-            paypalPayment2.setAccountNumber("147852");
-            paypalPayment2.setPaymentDate(new Date());
-            paypalPayment2.setAmount(142058.254);
+            // Exemple table per class
+            CreditCardPayment3 creditCardPayment3 = new CreditCardPayment3();
+            creditCardPayment3.setCardNumber("04011991");
+            creditCardPayment3.setAmount(10500);
+            creditCardPayment3.setPaymentDate(new Date());
+            creditCardPayment3.setExpirationDate("07/2026");
 
-            session.save(creditCardPayment2);
-            session.save(paypalPayment2);
+            PaypalPayment3 paypalPayment3 = new PaypalPayment3();
+            paypalPayment3.setAccountNumber("147853");
+            paypalPayment3.setPaymentDate(new Date());
+            paypalPayment3.setAmount(1500.25);
 
-            System.out.println("creditCardPayment " + creditCardPayment2);
-            System.out.println("paypalPayment " + paypalPayment2);
+            session.save(creditCardPayment3);
+            session.save(paypalPayment3);
+
+            System.out.println("creditCardPayment " + creditCardPayment3);
+            System.out.println("paypalPayment " + paypalPayment3);
 
             tx.commit();
 

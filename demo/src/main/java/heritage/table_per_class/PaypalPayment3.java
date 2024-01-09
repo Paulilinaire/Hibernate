@@ -1,4 +1,4 @@
-package heritage.single_table;
+package heritage.table_per_class;
 
 
 import lombok.Data;
@@ -9,9 +9,8 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "paypal2")
-@DiscriminatorValue("1")
-public class PaypalPayment2 extends Payment2 {
+@Table(name = "paypal3")
+public class PaypalPayment3 extends Payment3 {
 
     private String accountNumber;
 

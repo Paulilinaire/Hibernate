@@ -15,6 +15,12 @@
         <mapping class="heritage.single_table.Payment2"/>
         <mapping class="heritage.single_table.PaypalPayment2"/>
 
+        <mapping class="heritage.table_per_class.CreditCardPayment3"/>
+        <mapping class="heritage.table_per_class.Payment3"/>
+        <mapping class="heritage.table_per_class.PaypalPayment3"/>
+
+        <mapping class="demo.model.Person"/>
+
     </session-factory>
 
 </hibernate-configuration>
