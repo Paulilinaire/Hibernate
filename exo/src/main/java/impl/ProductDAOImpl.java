@@ -12,6 +12,7 @@ import org.hibernate.query.Query;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDAOImpl implements ProductDAO {
@@ -77,7 +78,6 @@ public class ProductDAOImpl implements ProductDAO {
             Product productToUpdate = session.get(Product.class, id);
 
             if (productToUpdate != null) {
-                // Mise à jour des propriétés du produit avec les nouvelles valeurs
                 productToUpdate.setReference(updatedProduct.getReference());
                 productToUpdate.setBrand(updatedProduct.getBrand());
                 productToUpdate.setSaleDate(updatedProduct.getSaleDate());
@@ -105,10 +105,8 @@ public class ProductDAOImpl implements ProductDAO {
     public List<Product> getAllProducts() {
         List<Product> productList = null;
         try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
             Query<Product> productQuery = session.createQuery("from Product", Product.class);
             productList = productQuery.list();
-            transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,9 +117,7 @@ public class ProductDAOImpl implements ProductDAO {
     public Product getProductById(long id) {
         Product product = null;
         try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
             product = session.get(Product.class, id);
-            transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -135,13 +131,11 @@ public class ProductDAOImpl implements ProductDAO {
         try {
             if (min >= 0) {
                 session = sessionFactory.openSession();
-                Transaction transaction = session.beginTransaction();
 
                 Query<Product> productQuery = session.createQuery("from Product where price >= :min", Product.class);
                 productQuery.setParameter("min", min);
 
                 productList = productQuery.list();
-                transaction.commit();
             }
         } catch (Exception e) {
             if (session != null) {
@@ -165,14 +159,12 @@ public class ProductDAOImpl implements ProductDAO {
         try {
             if (min.isBefore(max)) {
                 session = sessionFactory.openSession();
-                Transaction transaction = session.beginTransaction();
 
                 Query<Product> productQuery = session.createQuery("from Product where saleDate >= :min and saleDate <= :max", Product.class);
                 productQuery.setParameter("min", min);
                 productQuery.setParameter("max", max);
 
                 productList = productQuery.list();
-                transaction.commit();
             } else {
                 throw new Exception("Erreur de date : min doit être avant max.");
             }
@@ -197,13 +189,11 @@ public class ProductDAOImpl implements ProductDAO {
         try {
             if (max >= 0) {
                 session = sessionFactory.openSession();
-                Transaction transaction = session.beginTransaction();
 
                 Query<Product> productQuery = session.createQuery("from Product where storage < :max", Product.class);
                 productQuery.setParameter("max", max);
 
                 productList = productQuery.list();
-                transaction.commit();
             }
         } catch (Exception e) {
             if (session != null) {
@@ -217,6 +207,99 @@ public class ProductDAOImpl implements ProductDAO {
         }
 
         return productList;
+    }
+
+    public double calculateStockValueByBrand(String brand) {
+        double stockValue = 0;
+        Session session = null;
+
+        try {
+            session = sessionFactory.openSession();
+
+            Query<Double> stockValueQuery = session.createQuery("select sum(price * storage) from Product where brand = :brand", Double.class);
+            stockValueQuery.setParameter("brand", brand);
+
+            stockValue = stockValueQuery.uniqueResult(); // Retourne la somme du prix total des produits de la marque
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+        return stockValue;
+    }
+
+    public double calculateAveragePrice() {
+        double avgPrice = 0;
+        Session session = null;
+
+        try {
+            session = sessionFactory.openSession();
+
+            Query<Double> avgPriceQuery = session.createQuery("select avg(price) from Product", Double.class);
+            avgPrice = avgPriceQuery.uniqueResult(); // Retourne le prix moyen du produit
+
+        } catch (Exception e) {
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+        return avgPrice;
+    }
+
+    public List<Product> getBrandProducts(String brand) {
+        Session session = null;
+        List<Product> productList = new ArrayList<>();
+
+        try {
+            session = sessionFactory.openSession();
+
+            Query<Product> brandProductsQuery = session.createQuery("from Product where brand in :brand", Product.class);
+            brandProductsQuery.setParameter("brand", brand);
+
+            productList = brandProductsQuery.list();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+        return productList;
+    }
+
+
+    public void deleteProductsFromSpecificBrand(String brand) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            Query<Product> deleteQuery = session.createQuery("delete from Product where brand = :brand");
+            deleteQuery.setParameter("brand", brand);
+            deleteQuery.executeUpdate();
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
 

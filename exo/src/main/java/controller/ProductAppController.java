@@ -17,7 +17,7 @@ public class ProductAppController {
 
     private static ProductDAOImpl productDAO;
 
-    public static void main() throws Exception {
+    public static void main() {
         StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
         SessionFactory sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
         Session session = sessionFactory.openSession();
@@ -39,12 +39,12 @@ public class ProductAppController {
             System.out.println("9. Afficher la valeur du stock des produits d'une marque choisie");
             System.out.println("10. Afficher le prix moyen des produits");
             System.out.println("11. Afficher liste des produits d'une marque choisie");
-            System.out.println("12. Supprimer les produits d'une marque choisie de la table produit");
+            System.out.println("12. Supprimer les produits d'une marque choisie");
             System.out.println("0. Quitter l'application");
             System.out.println("Choix : ");
 
             choice = scanner.nextInt();
-            scanner.nextLine(); // Consomme la nouvelle ligne
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -72,16 +72,16 @@ public class ProductAppController {
                     filterByStorage(scanner);
                     break;
                 case 9:
-                    showBrandStorage(scanner);
+                    showStockValueByBrand(scanner);
                     break;
                 case 10:
                     showAveragePrice();
                     break;
                 case 11:
-                    showProductsFromBrand(scanner);
+                    showBrandProduct(scanner);
                     break;
                 case 12:
-                    deleteProductFromBrand(scanner);
+                    deleteBrandProducts(scanner);
                     break;
                 case 0:
                     System.out.println("Bye");
@@ -123,7 +123,7 @@ public class ProductAppController {
 
         Product product = new Product(reference, brand, saleDate, price, storage);
         productDAO.addProduct(product);
-        System.out.println("Product ajouté !");
+        System.out.println("Product ajouté avec succés !");
     }
 
     private static void displayProduct(Scanner scanner) {
@@ -174,7 +174,7 @@ public class ProductAppController {
 
         productDAO.updateProduct(id, updatedProduct);
 
-        System.out.println("Product mis à jour !");
+        System.out.println("Product mis à jour avec succés !");
     }
 
 
@@ -184,7 +184,7 @@ public class ProductAppController {
         scanner.nextLine();
 
         productDAO.deleteProduct(id);
-        System.out.println("Product supprimé !");
+        System.out.println("Product supprimé avec succés !");
 
     }
 
@@ -196,15 +196,13 @@ public class ProductAppController {
         } else {
             System.out.println("=== Liste des produits ===");
             for (Product product : products) {
-                System.out.println("###########");
                 System.out.println(
                         "reference : " + product.getReference() + ", " +
                                 "marque : " + product.getBrand() + ", " +
                                 "prix : " + product.getPrice() + ", " +
                                 "date de vente: " + product.getSaleDate() + ", " +
-                                "stock " + product.getStorage()
+                                "stock : " + product.getStorage()
                 );
-                System.out.println("###########");
             }
         }
     }
@@ -216,7 +214,7 @@ public class ProductAppController {
 
         List<Product> productList = productDAO.filterByPrice(min);
         for (Product pr : productList) {
-            System.out.println(pr.getId() + " " + pr.getReference());
+            System.out.println(pr.getId() + ". " + pr.getReference());
         }
     }
 
@@ -237,7 +235,7 @@ public class ProductAppController {
 
         List<Product> product = productDAO.filterByDate(firstSaleDate,secondSaleDate);
         for (Product pr: product) {
-            System.out.println(pr.getId() + " " + pr.getReference());
+            System.out.println(pr.getId() + ". " + pr.getReference());
 
         }
     }
@@ -249,21 +247,40 @@ public class ProductAppController {
 
         List<Product> productList = productDAO.filterByStorage(max);
         for (Product pr : productList) {
-            System.out.println(pr.getId() + " " + pr.getReference());
+            System.out.println(pr.getId() + ". " + pr.getReference());
         }
     }
 
-    private static void showBrandStorage(Scanner scanner) {
-        System.out.println("Saisir le stock");
+    private static void showStockValueByBrand(Scanner scanner) {
+        System.out.println("Saisir la marque : ");
+        String brand = scanner.nextLine();
+
+        double brandStorage = productDAO.calculateStockValueByBrand(brand);
+        System.out.println("Valeur du stock de la marque " + brand + " : " + brandStorage);
     }
 
     private static void showAveragePrice() {
+        double averagePrice = productDAO.calculateAveragePrice();
+        System.out.println("Le prix moyen des produits est : " + averagePrice + "€.");
     }
 
-    private static void showProductsFromBrand(Scanner scanner) {
+    private static void showBrandProduct(Scanner scanner) {
+        System.out.println("Saisir la marque : ");
+        String brand = scanner.nextLine();
+
+        List<Product> productList = productDAO.getBrandProducts(brand);
+        for (Product p: productList){
+            System.out.println("Produits : " +  p.getReference());
+        }
     }
 
-    private static void deleteProductFromBrand(Scanner scanner) {
+    private static void deleteBrandProducts(Scanner scanner) {
+        System.out.println("Saisir la marque : ");
+        String brand = scanner.nextLine();
+
+        productDAO.deleteProductsFromSpecificBrand(brand);
+        System.out.println("Produits de la marque " + brand + " supprimé avec succés !");
+
     }
 }
 
