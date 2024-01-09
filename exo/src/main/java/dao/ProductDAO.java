@@ -10,7 +10,7 @@ public interface ProductDAO {
 
     public void deleteProduct(long id);
 
-    public void updateProduct(long id);
+    public void updateProduct(long id, Product product);
 
     public List<Product> getAllProducts();
 
