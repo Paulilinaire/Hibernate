@@ -7,10 +7,13 @@
 
     <session-factory>
 
-        <mapping class="model.Product"/>
-        <mapping class="model.Image"/>
-        <mapping class="model.Comment"/>
-        <mapping class="model.Order"/>
+        <mapping class="entity.Employe"/>
+        <mapping class="entity.Entreprise"/>
+        <mapping class="entity.Manager"/>
+        <mapping class="entity.Personne"/>
+        <mapping class="entity.Personneprojet"/>
+        <mapping class="entity.PersonneprojetId"/>
+        <mapping class="entity.Projet"/>
 
     </session-factory>
 

@@ -1,13 +1,17 @@
 package model;
 
-import lombok.Data;
-import net.bytebuddy.asm.Advice;
+
+import lombok.Getter;
+import lombok.Setter;
+
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "product")
 public class Product {
@@ -25,6 +29,15 @@ public class Product {
     private double price;
 
     private int storage;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Image> images;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
+    @ManyToMany(mappedBy = "products")
+    private List<Order> orders = new ArrayList<>();
 
     public Product() {
     }
